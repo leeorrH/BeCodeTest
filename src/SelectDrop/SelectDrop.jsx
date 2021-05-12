@@ -11,6 +11,9 @@ const useStyles = makeStyles((theme) => ({
     selectEmpty: {
         marginTop: theme.spacing(2),
     },
+    selectInput : {
+        bottom: -9
+    }
 }));
 
 function SelectDrop({initialTestName, handleChange, id}) {
@@ -37,6 +40,7 @@ function SelectDrop({initialTestName, handleChange, id}) {
         <Select
             value={testName}
             onChange={handleTestChange}
+            className ={classes.selectInput}
         >
             {testNames.map(name =>
                 <MenuItem key={name} value={name}>{name}</MenuItem>
