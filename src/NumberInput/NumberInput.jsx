@@ -5,7 +5,8 @@ function NumberInput({ initValue, id, handleChange }) {
     const [value,setValue] = useState(initValue);
     
     const handleNumberChange = (e) => {
-        handleChange(e, 'value', id);
+        let valueAsInt = parseInt(e.target.value);
+        handleChange(valueAsInt, 'value', id);
     }
 
     return (
@@ -18,7 +19,7 @@ function NumberInput({ initValue, id, handleChange }) {
             }}
             variant="filled"
             onChange={(e) => {
-                setValue(e.target.value);
+                setValue(parseInt(e.target.value));
                 handleNumberChange(e);
             }}
         />

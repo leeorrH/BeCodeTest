@@ -18,8 +18,9 @@ function SelectDrop({initialTestName, handleChange, id}) {
     const [testName, setTestName] = useState(initialTestName);
 
     const handleTestChange = (event) => {
-        setTestName(event.target.value);
-        handleChange(event, 'name', id);
+        let name = event.target.value;
+        setTestName(name);
+        handleChange(name, 'name', id);
     };
     const testNames = [
         'Glucose (B)',
