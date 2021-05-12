@@ -64,7 +64,7 @@ function TestTable() {
             isValid = true;
         }
         return isValid;
-    }, [rowData]);
+    });
 
     useEffect(() => {
         axios.get(`${baseUrl}/blood_tests`, baseConfig).then(result => {
@@ -99,7 +99,7 @@ function TestTable() {
                     //handle error
                 });;
         }
-    }, [rowData, tests, validateRowData]);
+    }, [rowData]);
 
 
 
