@@ -45,13 +45,15 @@ const formateDate = (date = undefined) => {
     return (`${year}-${month}-${day}`);
 }
 const initialRowState = {
-    id: 'TestId',
+    id: '',
     name: '',
     test_date: formateDate(),
     value: 0
 };
 
 function TestTable() {
+    const [keyDictionary, setDictionary] = useState([]);
+    const [count,setCount] = useState(0);
     const classes = useStyles();
     const [tests, setTests] = useState([]);
     const [rowData, setRowData] = useState(initialRowState);
@@ -70,6 +72,11 @@ function TestTable() {
         axios.get(`${baseUrl}/blood_tests`, baseConfig).then(result => {
             console.log("comp render");
             if (result != null && Array.isArray(result.data)) {
+                let keyValue = result.data.map((test) =>{
+                    setCount(count+1);
+                   return ({ key: `test-${count}`, value: test.id });
+                });
+                setDictionary(keyValue);
                 setIsLoading(false);
                 setTests(result.data);
             }
@@ -91,8 +98,8 @@ function TestTable() {
             };
             axios.post(`${baseUrl}/blood_tests`, data, baseConfig).then(result => {
                 console.log(result);
-                let newData = tests.find(test => test.id === 'TestId');
-                newData.id = result.data.id;
+                let newTest = keyDictionary[keyDictionary.length];
+                newTest.value = result.data.id;
                 setIsNewRow(false);
             })
                 .catch((error) => {
@@ -103,15 +110,26 @@ function TestTable() {
 
 
 
-    const handleDelete = (TestId) => {
+    const handleDelete = (keyValue) => {
         //delete row from list 
-        let deleteIndex = tests.findIndex(test => test.id === TestId);
-        tests.splice(deleteIndex, 1);
-        let newTestsState = [...tests];
-        setTests(newTestsState);
+        let newTestsState;
+        let deleteIndex = tests.findIndex(test => test.id === keyValue.value);
+        if(deleteIndex === -1){
+            keyDictionary.splice(keyDictionary.length,1);
+            newTestsState = [...keyDictionary];
+            setDictionary(newTestsState);
+        }
+        else{
+            tests.splice(deleteIndex, 1);
+            newTestsState = [...tests];
+            setTests(newTestsState);
+            keyDictionary.splice(deleteIndex,1);
+            newTestsState = [...keyDictionary];
+            setDictionary(newTestsState);
+        }
         setIsNewRow(false);
-        if (TestId != 'TestId') {
-            axios.delete(`${baseUrl}/blood_tests/${TestId}`, baseConfig)
+        if (keyValue.value) {
+            axios.delete(`${baseUrl}/blood_tests/${keyValue.value}`, baseConfig)
                 .catch((error) => {
                     //handle error
                 });
@@ -121,6 +139,7 @@ function TestTable() {
     const handleAdd = () => {
         //isFirstLogic
         setTests([...tests, rowData]);
+        setDictionary([...keyDictionary,{key:`test-${count}`,value:''}]);
         setIsNewRow(true);
     }
 
@@ -141,9 +160,9 @@ function TestTable() {
         }
     }
 
-    const createRow = (test) => {
+    const createRow = (keyValue,test) => {
         return (
-            <TableRow key={test.id}>
+            <TableRow key={keyValue.key}>
                 <TableCell align="left">
                     <SelectDrop
                         handleChange={handleChange}
@@ -166,7 +185,7 @@ function TestTable() {
                     />
                 </TableCell>
                 <TableCell align="left">
-                    <IconButton onClick={() => handleDelete(test.id)} color="secondary" aria-label="delete">
+                    <IconButton onClick={() => handleDelete(keyValue)} color="secondary" aria-label="delete">
                         <DeleteIcon />
                     </IconButton>
                 </TableCell>
